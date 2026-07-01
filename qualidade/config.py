@@ -15,7 +15,7 @@ load_dotenv()
 # Parametros vindos do ambiente (.env)
 # --------------------------------------------------------------------------- #
 ARQUIVO_DADOS = os.getenv("ARQUIVO_DADOS", "Amostra de Dados.csv")
-ARQUIVO_RELATORIO = os.getenv("ARQUIVO_RELATORIO", "relatorio_qualidade.csv")
+ARQUIVO_RELATORIO = "relatorio_qualidade.csv"
 TOLERANCIA_VALOR = float(os.getenv("TOLERANCIA_VALOR", "1.0"))
 
 # Delimitador do CSV.

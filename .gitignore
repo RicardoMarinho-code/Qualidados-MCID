@@ -1,15 +1,8 @@
 # Configuracao local (contem o nome da planilha do governo)
 .env
 
-# Relatorios gerados
-relatorio_qualidade.csv
-
 # Python
 __pycache__/
 *.py[cod]
 .venv/
 venv/
-
-# Planilhas de dados (nao versionar dados do governo)
-*.csv
-!*.example.csv
