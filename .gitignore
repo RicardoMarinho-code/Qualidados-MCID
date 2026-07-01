@@ -6,3 +6,6 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+
+#dados
+2026_03_mcmv_ogu_dados_v3.csv
