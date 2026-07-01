@@ -20,7 +20,6 @@ TOLERANCIA_VALOR = float(os.getenv("TOLERANCIA_VALOR", "1.0"))
 
 # Delimitador do CSV.
 DELIMITADOR = ";"
-
 # --------------------------------------------------------------------------- #
 # Nomes das colunas relevantes (conforme cabecalho do arquivo)
 # --------------------------------------------------------------------------- #
