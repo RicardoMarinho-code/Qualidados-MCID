@@ -13,8 +13,6 @@ def regra_1(df):
 
     resultado = df.copy()
 
-    resultado["Regra_Testada"] = "Regra 1"
-
     def converter(coluna):
         # Se já for numérica, apenas trata valores nulos
         if pd.api.types.is_numeric_dtype(coluna):
@@ -51,7 +49,7 @@ def regra_1(df):
         == valor_total.round(2)
     )
 
-    resultado["Resultado_Teste"] = condicao.map({
+    resultado["Resultado_Teste_Regra_1"] = condicao.map({
         True: "Sucesso",
         False: "Insucesso"
     })

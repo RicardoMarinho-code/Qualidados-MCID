@@ -12,8 +12,6 @@ def regra_2(df):
 
     resultado = df.copy()
 
-    resultado["Regra_Testada"] = "Regra 2"
-
     def converter(coluna):
         # Se já for numérica, apenas trata valores nulos
         if pd.api.types.is_numeric_dtype(coluna):
@@ -48,7 +46,7 @@ def regra_2(df):
         (qtd_distratadas > 0)
     )
 
-    resultado["Resultado_Teste"] = condicao.map({
+    resultado["Resultado_Teste_Regra_2"] = condicao.map({
         True: "Sucesso",
         False: "Insucesso"
     })
