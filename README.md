@@ -45,50 +45,46 @@ Saida: resumo no console + `relatorio_qualidade.csv` detalhado
 ├── main.py                  # ponto de entrada (CLI + resumo)
 ├── .env / .env.example      # nome da planilha e parametros
 ├── requirements.txt
+├── R01 - soma_val_contratado_total.py   # uma funcao regra_N(df) por arquivo
+├── R02 - distrato_exige_quantidade.py
+├── ...                                  # (ver tabela de Regras abaixo)
+├── R12 - quantidade_de_vigentes.py
 └── qualidade/
     ├── config.py            # le o .env e nomes de colunas
     ├── io_dados.py          # leitura do CSV / gravacao do relatorio
     ├── ocorrencia.py        # dataclass Ocorrencia
     ├── utils.py             # parse de numero BR, normalizacao de nome
     ├── executor.py          # orquestra as regras
-    └── regras/
-        ├── __init__.py                 # registro das regras (REGRAS)
-        ├── consistencia_valor.py       # total = original + aporte
-        ├── marcadores_erro.py          # #N/D, #NOME?, #VALOR! ...
-        ├── unicidade_empreendimento.py # nomes duplicados
-        ├── booleanos.py                # col 36/37: Sim/Nao e nao-vazio
-        └── dados_faltantes.py          # col 38 obrigatoria
+    └── regras/              # implementacao em pacote (separada dos R01..R12)
 ```
 
 ## Regras
 
-| Regra | Descricao |
+Cada arquivo `RNN - ...py` contem uma funcao `regra_N(df)` que recebe o
+`DataFrame` e devolve uma copia com uma coluna `Resultado_Teste_Regra_N`
+marcada como `Sucesso` ou `Insucesso` por linha.
+
+| Arquivo | Descricao |
 |---|---|
-| Consistencia valor total | `val_contratado_total` = `original` + `aporte_adicional` (tolerancia `TOLERANCIA_VALOR`) |
-| Marcador de erro | Procura `#N/D`, `#NOME?`, `#VALOR!`, `#REF!`, `#DIV/0!` etc. em qualquer celula |
-| Unicidade empreendimento | Empreendimentos com o mesmo nome (normalizado) |
-| Booleano vazio/invalido | Colunas 36 e 37 devem ser `Sim`/`Nao` e nao-vazias |
-| Dado faltante | Coluna 38 (`qtd_entregues_2023`) obrigatoria |
+| `R01 - soma_val_contratado_total.py` | `val_contratado_total` = `val_contratado_original` + `val_aporte_adicional` |
+| `R02 - distrato_exige_quantidade.py` | Se `situacao_obra` = distratado, `qtd_distratadas` > 0 |
+| `R03 - quantidade_distratadas.py` | Se distratado, `qtd_distratadas` = `qtd_uh` − `qtd_entregues` |
+| `R04 - data_termino_ate_referencia.py` | `dt_termino` (se preenchida) ≤ `dt_referencia` |
+| `R05 - colunas_da_ficha_presentes.py` | Todos os campos da ficha de metadados existem no arquivo |
+| `R06 - marcadores_de_erro.py` | Colunas de texto sem `#N/D`, `#NOME?`, `#VALOR!`, `#REF!`, `#DIV/0!` |
+| `R07 - preenchimento_obrigatorio.py` | Campos marcados como obrigatorios na ficha estao preenchidos |
+| `R08 - desembolso_ano_ate_total.py` | `desembolsado_no_ano` ≤ `val_desembolsado` |
+| `R09 - desembolso_e_numerico.py` | `desembolsado_no_ano` contem valor numerico |
+| `R10 - datas_dentro_do_intervalo.py` | Datas entre `01/01/2009` e `dt_referencia` |
+| `R11 - entregues_ate_unidades.py` | `qtd_entregues` ≤ `qtd_uh` |
+| `R12 - quantidade_de_vigentes.py` | `qtd_vigentes` = `qtd_uh` − `qtd_entregues` − `qtd_distratadas` |
 
-## Resultado da amostra
-
-Execucao sobre `Amostra de Dados.csv` (5.859 registros, 43 colunas):
-
-| Regra | Ocorrencias |
-|---|---|
-| Consistencia valor total | 0 |
-| Marcador de erro (#ND/#NOME) | 0 |
-| Unicidade empreendimento | 296 |
-| Booleano vazio (col 36/37) | 18 |
-| Dado faltante (col 38) | 45 |
-| **TOTAL** | **359** |
+> Valores nulos, vazios ou invalidos sao tratados como `0` nas regras numericas.
+> Datas nao preenchidas sao consideradas `Sucesso` nas regras de data.
 
 ## Como adicionar uma nova regra
 
-1. Crie `qualidade/regras/minha_regra.py` com uma funcao
-   `verificar(linhas, colunas)` que retorna uma lista de `Ocorrencia`.
-2. Registre-a em `qualidade/regras/__init__.py` (lista `REGRAS`).
-
-> **Nota sobre o valor total:** a especificacao original mencionava subtracao,
-> mas os dados seguem a soma (`aporte ADICIONAL` acrescenta ao total). A regra
-> usa soma; por isso a amostra retorna 0 inconsistencias.
+1. Crie um arquivo `RNN - descricao.py` com uma funcao `regra_N(df)` que
+   recebe o `DataFrame` e devolve uma copia com a coluna
+   `Resultado_Teste_Regra_N` (`Sucesso` / `Insucesso`).
+2. Siga o padrao dos arquivos existentes para conversao de numeros (BR) e datas.
